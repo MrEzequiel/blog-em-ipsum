@@ -1,10 +1,10 @@
 import api from '../service/api'
 
-const getBlogList = async () => {
+const getBlogList = async (page: number) => {
   const response = await api.get('/posts', {
     params: {
       _limit: 10,
-      _page: 0
+      _page: page
     }
   })
 

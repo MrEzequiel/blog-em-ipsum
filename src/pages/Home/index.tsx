@@ -1,21 +1,36 @@
-import { FC } from 'react'
-import { MdLink } from 'react-icons/md'
-import { useQuery } from 'react-query'
+import { FC, useState } from 'react'
+import { MdArrowBack, MdArrowForward, MdLink } from 'react-icons/md'
+import { useQuery, useQueryClient } from 'react-query'
 import { Link } from 'react-router-dom'
 
 import getBlogList from '../../functions/getBlogList'
 import IBlog from '../../interfaces/IBlog'
 
 const Home: FC = () => {
+  const queryClient = useQueryClient()
+  const [currentPage, setCurrentPage] = useState(1)
+
   const {
     data: blogList,
     isError,
     isLoading,
     isFetching,
     error
-  } = useQuery<IBlog[], Error>('blog-list', getBlogList, {
-    staleTime: 1000 * 60 * 1 // 1 minute
-  })
+  } = useQuery<IBlog[], Error>(
+    ['blog-list', currentPage],
+    () => getBlogList(currentPage),
+    {
+      staleTime: 1000 * 60 * 1, // 1 minute
+      keepPreviousData: true
+    }
+  )
+
+  const handleMouseEnterNextPage = () => {
+    if (currentPage === 10) return
+    queryClient.prefetchQuery(['blog-list', currentPage + 1], () =>
+      getBlogList(currentPage + 1)
+    )
+  }
 
   return (
     <>
@@ -49,6 +64,29 @@ const Home: FC = () => {
             </li>
           ))}
         </ul>
+      )}
+
+      {blogList && blogList.length > 0 && (
+        <div className="flex items-center justify-between mt-8">
+          <button
+            className="flex items-center py-2 px-4 bg-gray-600 gap-2 disabled:opacity-50 shadow-sm"
+            disabled={currentPage === 1 || isLoading}
+            onClick={() => setCurrentPage(prevPage => prevPage - 1)}
+          >
+            <MdArrowBack /> Previous
+          </button>
+
+          <p className="text-gray-300 font-bold">Page {currentPage} </p>
+
+          <button
+            className="flex items-center py-2 px-4 bg-gray-600 gap-2 disabled:opacity-50 shadow-sm"
+            disabled={isLoading || currentPage === 10}
+            onMouseEnter={handleMouseEnterNextPage}
+            onClick={() => setCurrentPage(prevPage => prevPage + 1)}
+          >
+            Next <MdArrowForward />
+          </button>
+        </div>
       )}
 
       {isFetching && !isLoading && (
