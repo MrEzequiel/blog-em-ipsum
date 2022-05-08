@@ -1,13 +1,20 @@
 import { FC } from 'react'
 import { MdArrowBack } from 'react-icons/md'
-import { useQueries } from 'react-query'
+
+import { useMutation, useQueries, useQueryClient } from 'react-query'
 import { useNavigate, useParams } from 'react-router-dom'
+
+import deleteBlog from '../../functions/deleteBlog'
 import getBlog from '../../functions/getBlog'
 import getBlogComments from '../../functions/getBlogComments'
+import patchBlog from '../../functions/patchBlog'
+
 import IBlog from '../../interfaces/IBlog'
 import IBlogComments from '../../interfaces/IBlogComments'
 
 const Blog: FC = () => {
+  const queryClient = useQueryClient()
+
   const params = useParams()
   const navigate = useNavigate()
   const id = params.id as string
@@ -18,13 +25,40 @@ const Blog: FC = () => {
   ] = useQueries([
     {
       queryKey: ['blog', id],
-      queryFn: () => getBlog(id) as Promise<IBlog>
+      queryFn: () => getBlog(id) as Promise<IBlog>,
+      staleTime: 1000 * 60 * 2 // 2 minutes
     },
     {
-      queryKey: ['blog', id, 'comments'],
+      queryKey: ['comments', id],
       queryFn: () => getBlogComments(id) as Promise<IBlogComments[]>
     }
   ])
+
+  const { mutate: mutateDelete, isLoading: isLoadingDelete } = useMutation(
+    deleteBlog,
+    {
+      onSuccess: () => {
+        queryClient.removeQueries('blog-list')
+        navigate('/')
+      }
+    }
+  )
+  const { mutate: mutateEdit, isLoading: isLoadingEdit } = useMutation(
+    patchBlog,
+    {
+      onSuccess: (data: IBlog) => {
+        queryClient.setQueriesData(['blog', id], data)
+      }
+    }
+  )
+
+  const handleDelete = () => {
+    mutateDelete(id)
+  }
+
+  const handleEdit = () => {
+    mutateEdit(id)
+  }
 
   return (
     <>
@@ -35,12 +69,12 @@ const Blog: FC = () => {
       {!isLoading && !!blog && (
         <div className="pb-10 mb-10 border-b border-gray-900">
           <div
-            className="flex items-center cursor-pointer gap-2 mb-2 w-fit"
+            className="flex items-center cursor-pointer gap-2 mb-2 w-fit hover:brightness-150"
             onClick={() => {
               navigate('/')
             }}
           >
-            <button className="flex items-center justify-center bg-gray-600 text-gray-800 rounded-full w-6 h-6">
+            <button className="flex items-center justify-center bg-gray-600 text-gray-800 rounded-full w-5 h-5">
               <MdArrowBack />
             </button>
 
@@ -49,9 +83,26 @@ const Blog: FC = () => {
             </span>
           </div>
 
-          <h1 className="font-mono text-5xl italic font-bold text-gray-100 mb-6 first-letter:uppercase">
+          <h1 className="font-mono text-5xl italic font-bold text-gray-100 first-letter:uppercase">
             {blog.title}
           </h1>
+          <div className="mb-6 mt-2 flex gap-1">
+            <button
+              className="px-2 py-1 bg-gray-900 text-gray-400 disabled:opacity-50"
+              disabled={isLoadingDelete}
+              onClick={handleDelete}
+            >
+              {isLoadingDelete ? 'Deleting...' : 'Delete'}
+            </button>
+
+            <button
+              className="px-2 py-1 bg-gray-900 text-gray-400 disabled:opacity-50"
+              disabled={isLoadingEdit}
+              onClick={handleEdit}
+            >
+              {isLoadingEdit ? 'Editing...' : 'Edit'}
+            </button>
+          </div>
 
           <p className="text-lg text-gray-300 ">{blog.body}</p>
         </div>
