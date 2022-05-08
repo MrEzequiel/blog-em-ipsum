@@ -1,8 +1,24 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Header from './components/Header'
+import NotFound from './pages/404'
+import Blog from './pages/Blog'
+import Home from './pages/Home'
+
 const App = () => {
   return (
-    <div className="bg-gray-800 text-gray-200 h-screen w-screen">
-      <h1 className="text-3xl font-bold">Hello world!</h1>
-    </div>
+    <BrowserRouter>
+      <div className="bg-gray-800 text-gray-200 h-screen w-screen">
+        <Header />
+
+        <main className="container max-w-3xl mx-auto px-5 mt-12">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/blog/:id" element={<Blog />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
   )
 }
 
