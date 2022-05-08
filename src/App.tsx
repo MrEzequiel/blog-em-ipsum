@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { ReactQueryDevtools } from 'react-query/devtools'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import Header from './components/Header'
@@ -25,6 +26,8 @@ const App = () => {
           </main>
         </div>
       </BrowserRouter>
+
+      <ReactQueryDevtools />
     </QueryClientProvider>
   )
 }

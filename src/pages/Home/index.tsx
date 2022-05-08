@@ -11,8 +11,11 @@ const Home: FC = () => {
     data: blogList,
     isError,
     isLoading,
+    isFetching,
     error
-  } = useQuery<IBlog[], Error>('blog-list', getBlogList)
+  } = useQuery<IBlog[], Error>('blog-list', getBlogList, {
+    staleTime: 1000 * 60 * 1 // 1 minute
+  })
 
   return (
     <>
@@ -46,6 +49,10 @@ const Home: FC = () => {
             </li>
           ))}
         </ul>
+      )}
+
+      {isFetching && !isLoading && (
+        <p className="text-lg text-gray-400 mt-2">Updating...</p>
       )}
     </>
   )
