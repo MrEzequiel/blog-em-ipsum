@@ -1,5 +1,5 @@
-import { FC } from 'react'
-import { MdNotListedLocation } from 'react-icons/md'
+import { FC } from "react";
+import { MdNotListedLocation } from "react-icons/md";
 
 const NotFound: FC = () => {
   return (
@@ -9,7 +9,7 @@ const NotFound: FC = () => {
         404 - Nada encotrado
       </h1>
     </div>
-  )
-}
+  );
+};
 
-export default NotFound
+export default NotFound;

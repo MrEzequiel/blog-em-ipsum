@@ -1,12 +1,12 @@
-import { FC } from 'react'
-import { Link } from 'react-router-dom'
+import { FC } from "react";
+import { Link } from "react-router-dom";
 
 const Header: FC = () => {
   return (
     <header className="bg-gray-900 shadow-sm hover:shadow-md transition-all">
       <div className="container max-w-3xl mx-auto p-5 flex justify-between items-center">
         <h1 className="w-fit cursor-pointer text-xl hover:text-gray-50 hover:underline">
-          <Link to={'/'}>Blog em-ipsum</Link>
+          <Link to={"/"}>Blog em-ipsum</Link>
         </h1>
 
         <a
@@ -19,7 +19,7 @@ const Header: FC = () => {
         </a>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

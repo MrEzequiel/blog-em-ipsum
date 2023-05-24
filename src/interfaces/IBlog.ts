@@ -1,8 +1,14 @@
+import IBlogComments from "./IBlogComments";
+
 interface IBlog {
-  userId: number
-  id: number
-  title: string
-  body: string
+  userId: number;
+  id: number;
+  title: string;
+  body: string;
 }
 
-export default IBlog
+export interface BlogWithComments extends IBlog {
+  comments: IBlogComments[];
+}
+
+export default IBlog;

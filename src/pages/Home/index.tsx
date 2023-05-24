@@ -1,36 +1,51 @@
-import { FC, useState } from 'react'
-import { MdArrowBack, MdArrowForward, MdLink } from 'react-icons/md'
-import { useQuery, useQueryClient } from 'react-query'
-import { Link } from 'react-router-dom'
+import { FC, useState } from "react";
+import { MdArrowBack, MdArrowForward, MdLink } from "react-icons/md";
+import { Link } from "react-router-dom";
 
-import getBlogList from '../../functions/getBlogList'
-import IBlog from '../../interfaces/IBlog'
+import IBlog from "../../interfaces/IBlog";
+import { gql, useQuery } from "@apollo/client";
+
+const GET_ALL_POSTS = gql`
+  query AllPosts($data: AllPostsInput!) {
+    allPosts(data: $data) {
+      body
+      id
+      title
+    }
+  }
+`;
 
 const Home: FC = () => {
-  const queryClient = useQueryClient()
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1);
 
   const {
-    data: blogList,
-    isError,
-    isLoading,
-    isFetching,
-    error
-  } = useQuery<IBlog[], Error>(
-    ['blog-list', currentPage],
-    () => getBlogList(currentPage),
-    {
-      staleTime: 1000 * 60 * 1, // 1 minute
-      keepPreviousData: true
-    }
-  )
+    data,
+    loading: isLoading,
+    error,
+    client,
+  } = useQuery<{ allPosts: IBlog[] }>(GET_ALL_POSTS, {
+    variables: {
+      data: {
+        _limit: 10,
+        _page: currentPage,
+      },
+    },
+  });
+  const blogList = data?.allPosts;
+  const isError = !!error;
 
   const handleMouseEnterNextPage = () => {
-    if (currentPage === 10) return
-    queryClient.prefetchQuery(['blog-list', currentPage + 1], () =>
-      getBlogList(currentPage + 1)
-    )
-  }
+    if (currentPage === 10) return;
+    client.query({
+      query: GET_ALL_POSTS,
+      variables: {
+        data: {
+          _limit: 10,
+          _page: currentPage + 1,
+        },
+      },
+    });
+  };
 
   return (
     <>
@@ -42,7 +57,7 @@ const Home: FC = () => {
 
       {isError && (
         <p className="text-lg">
-          Error fetching blog list:{' '}
+          Error fetching blog list:{" "}
           <span className="text-red-400 font-light">{error.message}</span>
         </p>
       )}
@@ -88,12 +103,8 @@ const Home: FC = () => {
           </button>
         </div>
       )}
-
-      {isFetching && !isLoading && (
-        <p className="text-lg text-gray-400 mt-2">Updating...</p>
-      )}
     </>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

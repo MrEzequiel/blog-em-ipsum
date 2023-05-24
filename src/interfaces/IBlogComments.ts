@@ -1,9 +1,8 @@
 interface IBlogComments {
-  postId: number
-  id: number
-  name: string
-  email: string
-  body: string
+  id: number;
+  name: string;
+  email: string;
+  body: string;
 }
 
-export default IBlogComments
+export default IBlogComments;

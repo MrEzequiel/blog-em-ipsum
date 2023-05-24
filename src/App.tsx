@@ -1,18 +1,16 @@
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { ReactQueryDevtools } from 'react-query/devtools'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import Header from './components/Header'
+import Header from "./components/Header";
 
-import NotFound from './pages/404'
-import Blog from './pages/Blog'
-import Home from './pages/Home'
-
-const queryClient = new QueryClient()
+import NotFound from "./pages/404";
+import Blog from "./pages/Blog";
+import Home from "./pages/Home";
+import { client } from "./lib/apollo";
+import { ApolloProvider } from "@apollo/client";
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
+    <ApolloProvider client={client}>
       <BrowserRouter>
         <div className="bg-gray-800 text-gray-200 min-h-screen min-w-screen font-sans">
           <Header />
@@ -26,10 +24,8 @@ const App = () => {
           </main>
         </div>
       </BrowserRouter>
+    </ApolloProvider>
+  );
+};
 
-      <ReactQueryDevtools />
-    </QueryClientProvider>
-  )
-}
-
-export default App
+export default App;
